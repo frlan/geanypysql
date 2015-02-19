@@ -1,4 +1,4 @@
-# geanypysql
+# GeanyPySQL
 
 Making Geany a database client using GeanyPy
 
