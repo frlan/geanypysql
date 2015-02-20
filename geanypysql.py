@@ -4,13 +4,21 @@
 import gtk
 import geany
 
+# An attempt to get to know which (known) databases we have modules for
+# and therefor might could be working.
 
+available_databases = []
 try:
     import sqlanydb
-    sqla = True
+    available_databases.append(("SQLAnywhere"))
 except:
-    sqla = False
+    pass
 
+try:
+    import sqlite3
+    available_databases.append(("SQLite3"))
+except:
+    pass
 
 
 
@@ -31,6 +39,20 @@ class GeanyPySQLDB():
 
     def configuration_dialog(self):
         pass
+
+
+class GPS_sqlite(GeanyPySQLDB):
+
+    def __init__(self, path):
+        self.path = path
+
+    def connect(self):
+        if self.connection is None:
+            self.connection = sqlite3.connect(self.path)
+
+    def disconnect(self):
+        if self.connection is not None:
+            self.connection.close()
 
 
 class GPS_sqlanywhere(GeanyPySQLDB):
