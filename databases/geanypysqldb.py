@@ -3,7 +3,9 @@
 
 
 class GeanyPySQLDB():
-
+    """ A generic class all database classes should inherit from to
+        ensure an idendical api at minimum level.
+        This is not really implementing anything. """
     connection = None
 
     def __init__(self, userid = None, password = None, host = None,

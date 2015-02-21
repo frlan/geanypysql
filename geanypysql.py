@@ -6,8 +6,13 @@ import geany
 import sys
 import os
 
+# Will be used as kind of a plugin system for different database types
 available_databases = {}
 
+# This is a workaround to make Python find the submodules due to the way,
+# GeanyPy is loading the Python plugins.
+# After path has been updated, manually checking for database specific
+# stuff.
 sys.path.append(os.path.dirname(__file__))
 try:
     from databases.sqlite import GPS_sqlite
@@ -15,14 +20,18 @@ try:
              "name" : "SQLite3",
              "class" : GPS_sqlite}
 except:
-    print "failed"
-#from databases.sqlanywhere import GPS_sqlite
-#    print "1"
-#    available_databases["SQLAnywhere"] = {
-#             "name" : "SQLAnywhere",
-#             "class" : GPS_sqlanywhere}
-#except:
-#    print "failed"
+    print "failed: SQLite"
+
+try:
+    from databases.sqlanywhere import GPS_sqlite
+
+    available_databases["SQLAnywhere"] = {
+             "name" : "SQLAnywhere",
+             "class" : GPS_sqlanywhere}
+except:
+    print "failed: SQLAnywhere"
+
+
 sys.path.remove(os.path.dirname(__file__))
 
 class GeanyPySQL(geany.Plugin):

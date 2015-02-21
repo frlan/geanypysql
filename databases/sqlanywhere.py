@@ -12,6 +12,8 @@ sys.path.remove(os.path.dirname(__file__))
 
 
 class GPS_sqlanywhere(GeanyPySQLDB):
+    """ Special class for SAP Sybases SQLAnywhere and IQ databases based
+        upon sqlanydb-python-driver. """
 
     def __init__(self, uid=None, pwd=None, server=None):
         self.userid = uid
