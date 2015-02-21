@@ -20,6 +20,6 @@ class GeanyPySQLDB():
         pass
 
     def connect_dialog(self):
-        pass
+        geany.dialogs.show_msgbox("Not yet implemented", gtk.MESSAGE_ERROR)
 
 

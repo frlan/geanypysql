@@ -3,10 +3,14 @@
 
 import sys
 import os
+import geany
+import gtk
+
 import sqlite3
 sys.path.append(os.path.dirname(__file__))
 from .geanypysqldb import GeanyPySQLDB
 sys.path.remove(os.path.dirname(__file__))
+
 
 class GPS_sqlite(GeanyPySQLDB):
 
@@ -24,4 +28,19 @@ class GPS_sqlite(GeanyPySQLDB):
             self.connection.close()
 
     def connect_dialog(self):
-		pass
+
+        db_path = geany.dialogs.show_input(
+            title="Path of sqlite DB",
+            parent=geany.main_widgets.window,
+            label_text="Please specify path of SQLite database")
+        if os.path.isfile(db_path):
+            self.path = db_path
+            try:
+                self.connect()
+                print "Connected"
+            except:
+                geany.dialogs.show_msgbox("Could not create connection", gtk.MESSAGE_ERROR)
+        else:
+            geany.dialogs.show_msgbox("Seems not to be a valid path", gtk.MESSAGE_ERROR)
+
+
