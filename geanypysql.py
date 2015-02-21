@@ -3,75 +3,27 @@
 
 import gtk
 import geany
+import sys
+import os
 
-# An attempt to get to know which (known) databases we have modules for
-# and therefor might could be working.
+available_databases = {}
 
-available_databases = []
+sys.path.append(os.path.dirname(__file__))
 try:
-    import sqlanydb
-    available_databases.append(("SQLAnywhere"))
+    from databases.sqlite import GPS_sqlite
+    available_databases["SQLite3"] = {
+             "name" : "SQLite3",
+             "class" : GPS_sqlite}
 except:
-    pass
-
-try:
-    import sqlite3
-    available_databases.append(("SQLite3"))
-except:
-    pass
-
-
-
-class GeanyPySQLDB():
-
-    connection = None
-
-
-    def __init__(self, userid = None, password = None, host = None,
-            database = None, odbc = None ):
-        pass
-
-    def connect(self):
-        pass
-
-    def disconnect(self):
-        pass
-
-    def configuration_dialog(self):
-        pass
-
-
-class GPS_sqlite(GeanyPySQLDB):
-
-    def __init__(self, path):
-        self.path = path
-
-    def connect(self):
-        if self.connection is None:
-            self.connection = sqlite3.connect(self.path)
-
-    def disconnect(self):
-        if self.connection is not None:
-            self.connection.close()
-
-
-class GPS_sqlanywhere(GeanyPySQLDB):
-
-    def __init__(self, uid=None, pwd=None, server=None):
-        self.userid = uid
-        self.password = pwd
-        self.server = server
-
-    def connect(self):
-        if self.connection is None:
-            self.connection = sqlanydb.connect( userid=self.userid,
-                                    password=self.password,
-                                    server=self.server)
-
-    def disconnect(self):
-        if self.connection is not None:
-            self.connection.close()
-
+    print "failed"
+#from databases.sqlanywhere import GPS_sqlite
+#    print "1"
+#    available_databases["SQLAnywhere"] = {
+#             "name" : "SQLAnywhere",
+#             "class" : GPS_sqlanywhere}
+#except:
+#    print "failed"
+sys.path.remove(os.path.dirname(__file__))
 
 class GeanyPySQL(geany.Plugin):
 
@@ -100,25 +52,37 @@ class GeanyPySQL(geany.Plugin):
         # And add submenu to global one
         self.root_menu.set_submenu(plugin_menu)
 
-        # Now adding items to submenu
-        mi_connect = gtk.MenuItem("_Connect")
-        plugin_menu.append(mi_connect)
+        # Now adding submenus for each database typ
+        # Not sure whether this really is good in reality
+        # or it just sucks. We will see.
+        for supported_database in available_databases.keys():
+            # creating submenu for database typ
+            tmp_db_mi = gtk.MenuItem(available_databases[supported_database]["name"])
+            tmp_db_submenu = gtk.Menu()
+            tmp_db_mi.set_submenu(tmp_db_submenu)
 
-        mi_disconnect = gtk.MenuItem("_Disconnect")
-        plugin_menu.append(mi_disconnect)
+            # Adding basic functions to submenu
+            tmp_connect = gtk.MenuItem("_Connect1")
+            tmp_db_submenu.append(tmp_connect)
 
-        # And callbacks
-        mi_connect.connect("activate", self.on_click_connect, None)
-        mi_disconnect.connect("activate", self.on_click_disconnect, None)
+            tmp_disconnect = gtk.MenuItem("_Disconnect")
+            tmp_db_submenu.append(tmp_disconnect)
 
+            # Connecting callbacks
+            tmp_connect.connect("activate", self.on_click_connect, supported_database)
+            tmp_disconnect.connect("activate", self.on_click_disconnect, supported_database)
+
+            plugin_menu.append(tmp_db_mi)
+
+        # Finally, show all items
         plugin_menu.show_all()
 
     def cleanup(self):
         self.root_menu.destroy()
 
     def on_click_connect(self, widget, data):
-        self.db = GPS_sqlanywhere(uid='dba', pwd='sql', server='foo')
-        self.db.connect()
+        self.db = available_databases[data]["class"]()
+        self.db.connect_dialog()
 
     def on_click_disconnect(self, widget, data):
         self.db.disconnect()
