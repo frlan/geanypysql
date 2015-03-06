@@ -18,10 +18,10 @@ class GeanyPySQLDB():
     def disconnect(self):
         pass
 
-    def configuration_dialog(self):
+    def connect_dialog_box(self):
         pass
 
-    def connect_dialog(self):
-        geany.dialogs.show_msgbox("Not yet implemented", gtk.MESSAGE_ERROR)
+    def execute_query(self, query):
+        pass
 
 

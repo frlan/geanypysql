@@ -14,13 +14,16 @@ available_databases = {}
 # After path has been updated, manually checking for database specific
 # stuff.
 sys.path.append(os.path.dirname(__file__))
+
+from ui import UI_connection_dialog
+
 try:
     from databases.sqlite import GPS_sqlite
     available_databases["SQLite3"] = {
              "name" : "SQLite3",
              "class" : GPS_sqlite}
 except:
-    print "failed: SQLite"
+    print "Could not load: SQLite"
 
 try:
     from databases.sqlanywhere import GPS_sqlite
@@ -29,7 +32,7 @@ try:
              "name" : "SQLAnywhere",
              "class" : GPS_sqlanywhere}
 except:
-    print "failed: SQLAnywhere"
+    print "Could not load: SQLAnywhere"
 
 
 sys.path.remove(os.path.dirname(__file__))
@@ -61,27 +64,19 @@ class GeanyPySQL(geany.Plugin):
         # And add submenu to global one
         self.root_menu.set_submenu(plugin_menu)
 
-        # Now adding submenus for each database typ
-        # Not sure whether this really is good in reality
-        # or it just sucks. We will see.
-        for supported_database in available_databases.keys():
-            # creating submenu for database typ
-            tmp_db_mi = gtk.MenuItem(available_databases[supported_database]["name"])
-            tmp_db_submenu = gtk.Menu()
-            tmp_db_mi.set_submenu(tmp_db_submenu)
+        # Adding basic functions to submenu
+        mi_connect = gtk.MenuItem("_Connect")
+        mi_disconnect = gtk.MenuItem("_Disconnect")
+        mi_execute = gtk.MenuItem("_Execute")
 
-            # Adding basic functions to submenu
-            tmp_connect = gtk.MenuItem("_Connect1")
-            tmp_db_submenu.append(tmp_connect)
+        # Connecting callbacks
+        mi_connect.connect("activate", self.on_click_connect)
+        mi_disconnect.connect("activate", self.on_click_disconnect)
+        mi_execute.connect("activate", self.on_click_execute)
 
-            tmp_disconnect = gtk.MenuItem("_Disconnect")
-            tmp_db_submenu.append(tmp_disconnect)
-
-            # Connecting callbacks
-            tmp_connect.connect("activate", self.on_click_connect, supported_database)
-            tmp_disconnect.connect("activate", self.on_click_disconnect, supported_database)
-
-            plugin_menu.append(tmp_db_mi)
+        plugin_menu.append(mi_connect)
+        plugin_menu.append(mi_disconnect)
+        plugin_menu.append(mi_execute)
 
         # Finally, show all items
         plugin_menu.show_all()
@@ -89,10 +84,23 @@ class GeanyPySQL(geany.Plugin):
     def cleanup(self):
         self.root_menu.destroy()
 
-    def on_click_connect(self, widget, data):
-        self.db = available_databases[data]["class"]()
-        self.db.connect_dialog()
+    def on_click_connect(self, widget):
+        dialog = UI_connection_dialog(available_databases)
+        dialog.dialog.run()
 
     def on_click_disconnect(self, widget, data):
         self.db.disconnect()
 
+    def on_click_execute(self, widget, data):
+        self.run_query()
+
+    def run_query(self, *args):
+        """ Actually run a query and return results"""
+        query = geany.document.get_current().editor.scintilla.get_selection_contents()
+        if len(query) == 0:
+            query = geany.document.get_current().editor.scintilla.get_contents()
+        try:
+            return self.db.execute_query(query)
+        except Exception, e:
+            print e
+            return None

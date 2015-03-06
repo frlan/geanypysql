@@ -27,20 +27,19 @@ class GPS_sqlite(GeanyPySQLDB):
         if self.connection is not None:
             self.connection.close()
 
-    def connect_dialog(self):
+    def connect_dialog_box(self):
+        self.vbox = gtk.VBox()
+        self.hbox = gtk.HBox()
+        self.vbox.pack_start(self.hbox,False, False, 0)
 
-        db_path = geany.dialogs.show_input(
-            title="Path of sqlite DB",
-            parent=geany.main_widgets.window,
-            label_text="Please specify path of SQLite database")
-        if os.path.isfile(db_path):
-            self.path = db_path
-            try:
-                self.connect()
-                print "Connected"
-            except:
-                geany.dialogs.show_msgbox("Could not create connection", gtk.MESSAGE_ERROR)
-        else:
-            geany.dialogs.show_msgbox("Seems not to be a valid path", gtk.MESSAGE_ERROR)
+        label = gtk.Label("Please specify path of SQLite database")
+        entry = gtk.Entry()
+
+        self.hbox.pack_start(label,False, False, 0)
+        self.hbox.pack_end(entry,False, False, 0)
+
+        self.vbox.show_all()
+
+        return self.vbox
 
 
