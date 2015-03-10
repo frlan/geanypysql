@@ -26,11 +26,11 @@ except:
     print "Could not load: SQLite"
 
 try:
-    from databases.sqlanywhere import GPS_sqlite
+    from databases.sqlanywhere import GPS_sqlanywhere
 
     available_databases["SQLAnywhere"] = {
-             "name" : "SQLAnywhere",
-             "class" : GPS_sqlanywhere}
+         "name" : "SQLAnywhere",
+         "class" : GPS_sqlanywhere}
 except:
     print "Could not load: SQLAnywhere"
 
