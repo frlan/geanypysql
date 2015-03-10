@@ -4,7 +4,7 @@ Making Geany a database client using GeanyPy
 
 ## Supported database types
 
-The plugin currently supports:
+The plugin currently supports (Python modul in braces):
 
 - SQLite (sqlite3)
 - SQLAnywhere  (sqlanydb)
