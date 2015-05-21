@@ -14,6 +14,8 @@ available_databases = {}
 # After path has been updated, manually checking for database specific
 # stuff.
 sys.path.append(os.path.dirname(__file__))
+
+# SQLite
 try:
     from databases.sqlite import GPS_sqlite
     available_databases["SQLite3"] = {
@@ -22,6 +24,8 @@ try:
 except:
     print "failed: SQLite"
 
+
+# SQLAnywhere 
 try:
     from databases.sqlanywhere import GPS_sqlanywhere
 
@@ -36,6 +40,7 @@ sys.path.remove(os.path.dirname(__file__))
 
 class GeanyPySQL(geany.Plugin):
 
+	# Gernic GeanyPy-Plugin stuff
     __plugin_name__ = "GeanyPySQL"
     __plugin_version__ = "0.1"
     __plugin_description__ = "Making an SQL client out of Geany"
@@ -95,4 +100,3 @@ class GeanyPySQL(geany.Plugin):
 
     def on_click_disconnect(self, widget, data):
         self.db.disconnect()
-

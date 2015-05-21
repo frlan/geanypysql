@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import geany
+import gtk
 
 class GeanyPySQLDB():
     """ A generic class all database classes should inherit from to
@@ -23,5 +25,3 @@ class GeanyPySQLDB():
 
     def connect_dialog(self):
         geany.dialogs.show_msgbox("Not yet implemented", gtk.MESSAGE_ERROR)
-
-
